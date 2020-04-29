@@ -5,6 +5,7 @@ r3con-god simple tool with bash that help you in recon :)
 ## Usage:
 ```bash
 > git clone https://github.com/M4HunT3r/r3con-god
+> cd r3con-god/
 > bash r3con-god.sh {example.com}
 ```
 ## Tools:
