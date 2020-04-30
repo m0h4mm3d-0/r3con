@@ -1,5 +1,5 @@
 #!bin/bash
-#by @m4hunt3r:Mohamede-Addar &&  @safa7:Sohail-Bzioui
+#by @m4hunt3r:Mohamede-Addar &&  @cpc-virus:Sohail-Bzioui
 
 RED='\033[0;31m'
 NC='\033[0m'
