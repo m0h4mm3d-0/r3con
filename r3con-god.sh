@@ -24,6 +24,18 @@ amass enum --passive -d $1 | tee -a domains.txt
 echo "{+} starting crt.sh"
 curl -s https://crt.sh/\?q\=\%.$1\&output\=json | jq -r '.[].name_value' | sed 's/\*\.//g' | tee -a domains.txt
 
+###threatcrowd.org
+echo "{+} starting threatcrowd"
+curl https://www.threatcrowd.org/searchApi/v2/domain/report/?domain=$1 |jq .subdomains |grep -o '\w.*$1' | tee -a domains.txt
+
+###hackertarget.com
+echo "{+} starting hackertarget"
+curl https://api.hackertarget.com/hostsearch/\?q\=$1 | grep -o '\w.*$1' | tee -a domains.txt
+
+###certspotter.com
+echo "{+} starting certspotter"
+curl https://certspotter.com/api/v0/certs?domain=$1 | jq '.[].dns_names[]' | sed 's/\"//g' | sed 's/\*\.//g' | tee -a domains.txt
+
 ###rm duplicate (sub)domains
 sort -u domains.txt -o domains.txt
 
