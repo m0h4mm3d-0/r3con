@@ -4,49 +4,28 @@
 RED='\033[0;31m'
 NC='\033[0m'
 
-###sublist3r
-echo "{+} starting sublist3r"
+#enumerating subdomains
 sublist3r -d $1 -v -o domains.txt
-
-###subfinder
-echo "{+} starting subfinder"
 subfinder -d $1 | tee -a domains.txt
-
-###assetfinder
-echo "{+} starting assetfinder"
 assetfinder --subs-only $1 | tee -a domains.txt
-
-###amass
-echo "{+} starting amass"
 amass enum --passive -d $1 | tee -a domains.txt
-
-###crt.sh
-echo "{+} starting crt.sh"
 curl -s https://crt.sh/\?q\=\%.$1\&output\=json | jq -r '.[].name_value' | sed 's/\*\.//g' | tee -a domains.txt
-
-###threatcrowd.org
-echo "{+} starting threatcrowd"
 curl https://www.threatcrowd.org/searchApi/v2/domain/report/?domain=$1 |jq .subdomains |grep -o '\w.*$1' | tee -a domains.txt
-
-###hackertarget.com
-echo "{+} starting hackertarget"
 curl https://api.hackertarget.com/hostsearch/\?q\=$1 | grep -o '\w.*$1' | tee -a domains.txt
-
-###certspotter.com
-echo "{+} starting certspotter"
 curl https://certspotter.com/api/v0/certs?domain=$1 | jq '.[].dns_names[]' | sed 's/\"//g' | sed 's/\*\.//g' | tee -a domains.txt
-
-###rm duplicate (sub)domains
 sort -u domains.txt -o domains.txt
 
-###subjack
-echo "{+} checking for subdomain takeover"
+#from lazyrecon (nahamsec) == checking alive subdomains
+cat domains.txt | sort -u | httprobe | tee -a responsive.txt
+cat responsive.txt | sed 's/\http\:\/\///g' | sed 's/\https\:\/\///g' | sort -u | while read line; do
+	probeurl=$(cat responsive.txt | sort -u | grep -m 1 $line)
+	echo "$probeurl" >> alive.txt
+done
+echo "$(cat alive.txt | sort -u)" > alive.txt
+echo  "Total of $(wc -l alive.txt | awk '{print $1}') live subdomains were found"
+
+#testing for subdomain takeover
 subjack -w domains.txt -t 100 -timeout 30 -ssl -c ~/go/src/github.com/haccer/subjack/fingerprints.json -v 3 | tee -a sub-takeover.txt
-
-###check alive domains
-echo "checking for alive (sub)domains"
-cat domains.txt | httprobe | tee -a alive.txt
-
 ###sorting headers and response body
 mkdir headers
 mkdir responsebody
