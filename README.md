@@ -8,6 +8,16 @@ r3con-god simple tool with bash that help you in recon :)
 > cd r3con-god/
 > bash r3con-god.sh {example.com}
 ```
+## what does this script do?
+* subdomain enumeration
+* checking for alive domains
+* checking for subdomain takeover
+* sorting headers and response body
+* collect javascript files
+* collect endpoints
+* testing for put method
+* taking screenshots using aquatone
+
 ## Tools:
 sublist3r,
 subfinder,
